@@ -6,19 +6,19 @@ class DodoCoin:
         self.mem_pool = []
         self._genesis_block = None
         self.wallets = {}
-        self.difficulty_level = 4 # Added new attribute.
-
-        # Problem Statement 3.b.i
-        # Create an attribute current version
+        self.difficulty_level = 4  # Added new attribute.
+        # Solution 3.b.i
+        # Created an attribute current_version
         self.current_version = 3
         self.__create_genesis_block()
 
     def __create_genesis_block(self):
-        # Problem Statement 3.b.ii
-        # Pass an argument current version
-        self._genesis_block = Block(index=0, transactions=[], previous_block_hash=0, difficulty_level=1,
-                              metadata='The Times 03/Jan/2009 Chancellor on brink of second bailout for banks Genesis '
-                                       'block using same string as bitcoin!')
+        # Solution 3.b.ii
+        # Passed an argument current_version
+        self._genesis_block = Block(index=0, transactions=[], previous_block_hash=0,
+                                    current_version=self.current_version, difficulty_level=1,
+                                    metadata='The Times 03/Jan/2009 Chancellor on brink of second bailout for banks'
+                                             'Genesis block using same string as bitcoin!')
         self._genesis_block.generate_hash()
 
     @property
@@ -39,6 +39,9 @@ class DodoCoin:
     # Added new function.
     def update_difficulty_level(self, new_level):
         self.difficulty_level = new_level
+
+    def update_current_version(self, new_version):
+        self.current_version = new_version
 
 
 if __name__ == "__main__":

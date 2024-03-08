@@ -2,16 +2,16 @@ import time
 import hashlib
 import json
 
+# Solution 3.b.iii
+# Added a parameter cuurent_version
+
 
 class Block:
-    # Problem Statement 3.b.iii
-    # Add a parameter version
-    def __init__(self, index, transactions, previous_block_hash, difficulty_level=1, metadata=''):
+    def __init__(self, index, transactions, previous_block_hash, current_version, difficulty_level=1, metadata=''):
         self._index = index
-
-        # Problem Statement 3.b.iii
-        # Create an instance attribute _version
-        
+        # Solution 3.b.iii
+        # Created an instance attribute _version
+        self._version = current_version
         self._timestamp = time.time()
         self._previous_block_hash = previous_block_hash
         self._metadata = metadata
@@ -21,38 +21,57 @@ class Block:
         self._block_hash = ''
         self._transactions = transactions
 
-        # Problem Statement 3.a.i
-        # Create an instance variable _transaction_counter which is set to the length of the transactions list
+        # Solution 3.a.i
+        # Created an instance variable _transaction_counter which is set to the length of the transactions list
+        self._transaction_counter = len(self._transactions)
 
     def __str__(self):
+        # Solution 3.b.iii
+        # Added _version
+        # Solution 3.a.i
+        # Added _transaction_counter
         return f'\nBlock index: {self._index}' \
+               f'\nVersion: {self._version}' \
                f'\nTimestamp: {self._timestamp}' \
                f'\nPrevious Block Hash: {self._previous_block_hash}' \
                f'\nMetadata: {self._metadata}' \
                f'\nmerkle root: {self._merkle_root}' \
                f'\nNonce: {self._nonce}' \
                f'\nDifficulty level: {self._difficulty_level}' \
+               f'\nTransaction Count: {self._transaction_counter}' \
                f'\nBlock Hash: {self._block_hash}' \
                f'\nTransactions: {self._transactions}'
-               # Problem Statement 3.b.iii
-               # Add _version
-        
-               # Problem Statement 3.a.i
-               # Add _transaction_counter
-                
+
+    def __dict__(self):
+        return {
+            'Block index': self._index,
+            'Version': self._version,
+            'Timestamp': self._timestamp,
+            'Previous Block Hash': self._previous_block_hash,
+            'Metadata': self._metadata,
+            'merkle root': self._merkle_root,
+            'Nonce': self._nonce,
+            'Difficulty level': self._difficulty_level,
+            'Transaction Count': self._transaction_counter,
+            'Block Hash': self._block_hash,
+            'Transactions': self._transactions,
+        }
+
     def __repr__(self):
-        return self.__str__()
+        # return self.__str__()
+        return str(self.__dict__())
 
     @property
     def block_hash(self):
         return self._block_hash
 
     # Now this function generates hash based on the difficulty level of block.
-    # Problem Statement 2.a
-    # Change this function so that it returns the hash_value
+    # Solution 2.a
+    # Changed this function so that it returns the hash_value
     def generate_hash(self):
         self._merkle_root = self._generate_merkle_root()
-        while True: # Keep generating a new hash value
+
+        while True:  # Keep generating a new hash value
             hash_string = ''.join([
                 str(self._index),
                 str(self._timestamp),
@@ -60,18 +79,21 @@ class Block:
                 str(self._metadata),
                 str(self._merkle_root),
                 str(self._nonce),
-                str(self._difficulty_level)
-                # Problem Statement 3(c)
-                # Add version
-                # Add _transaction_counter
-                
+                str(self._difficulty_level),
+                # Solution 3(c)
+                # Added version
+                str(self._version),
+                # Added _transaction_counter
+                str(self._transaction_counter)
             ])
             encoded_hash_string = hash_string.encode('utf-8')
             hash_value = hashlib.sha256(encoded_hash_string).hexdigest()
-            if int(hash_value[:self._difficulty_level], 16) == 0: # Check for difficulty level.
+            # Check for difficulty level.
+            if int(hash_value[:self._difficulty_level], 16) == 0:
                 break
             self._nonce += 1
         self._block_hash = hash_value
+        return hash_value
 
     def _generate_merkle_root(self):
         hash_list = self._create_hash_list(self._transactions)
@@ -118,11 +140,14 @@ class Block:
 
         return hash_list[0]
 
+    def get_previous_hash(self):
+        return self._previous_block_hash
+
 
 if __name__ == "__main__":
     previous_block_hash = hashlib.sha256(b"Previous Block Hash").hexdigest()
     transactions = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     new_block = Block(index=10, transactions=transactions, previous_block_hash=previous_block_hash,
-                      difficulty_level=5)
+                      current_version=1, difficulty_level=5)
     new_block.generate_hash()
     print(new_block)
